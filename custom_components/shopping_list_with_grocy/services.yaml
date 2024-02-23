@@ -1,0 +1,37 @@
+# Services.yaml for shopping_list_with_grocy integration
+
+refresh_products:
+
+add_product:
+  fields:
+    product_id:
+      example: "sensor.shopping_list_with_grocy_<your product>"
+      required: true
+      selector:
+        text:
+    note:
+      example: "This is the note of the shopping list item..."
+      required: false
+      selector:
+        text:
+
+remove_product:
+  fields:
+    product_id:
+      example: "sensor.shopping_list_with_grocy_<your product>"
+      required: true
+      selector:
+        text:
+
+update_note:
+  fields:
+    product_id:
+      example: "sensor.shopping_list_with_grocy_<your product>"
+      required: true
+      selector:
+        text:
+    note:
+      example: "This is the note of the shopping list item..."
+      required: true
+      selector:
+        text:

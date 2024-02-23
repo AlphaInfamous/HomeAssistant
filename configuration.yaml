@@ -1,0 +1,98 @@
+# Loads default set of integrations. Do not remove.
+default_config:
+
+zeroconf:
+http:
+  use_x_forwarded_for: true
+  trusted_proxies:
+    - !secret trusted_proxies
+
+recorder:
+  db_url: !secret db_url
+
+influxdb:
+  host: 192.168.9.144
+  port: 8086
+  database: vault
+  username: !secret influx_username
+  password: !secret influx_password
+  max_retries: 3
+  default_measurement: state
+
+camera:
+  - platform: local_file
+    file_path: /<config path>/custom_components/mail_and_packages/mail_none.gif
+    name: mail_usps
+
+# Text to speech
+tts:
+  - platform: google_translate
+
+sensor:
+  - platform: systemmonitor
+    resources:
+      - type: processor_use
+      - type: processor_temperature
+      - type: memory_free
+      - type: disk_use_percent
+        arg: /
+      - type: disk_use
+      - type: disk_free
+      - type: throughput_network_in
+        arg: enp0s3
+      - type: throughput_network_out
+        arg: enp0s3
+
+homeassistant:
+  packages: !include_dir_named packages
+  # allowlist_external_dirs:
+  #   - "/api/nest/event_media/"
+automation: !include automations.yaml
+automation dir: !include_dir_merge_list automations/
+
+input_boolean: !include includes/input_booleans.yaml
+input_select: !include includes/input_selects.yaml
+
+notify: !include notify-groups.yaml
+script: !include_dir_merge_list scripts/
+scene: !include scenes.yaml
+template: !include_dir_merge_list templates
+frontend:
+  themes: !include_dir_merge_named themes
+
+zha:
+  device_config: !include includes/devices/device_configs.yaml
+  zigpy_config:
+    ota:
+      ikea_provider: true # Auto update Trådfri devices
+      ledvance_provider: true # Auto update LEDVANCE/OSRAM devices
+      salus_provider: true # Auto update SALUS/Computime devices
+      inovelli_provider: true # Auto update INOVELLI devices
+      sonoff_provider: true
+      otau_directory: ./ota # Utilize .ota files to update everything else
+
+shell_command:
+  push_updates_to_github: /bin/bash pushupdates.sh
+
+system_log:
+  max_entries: 100
+  fire_event: true
+
+logger:
+  default: info
+  logs:
+    homeassistant.components.nest: info
+    homeassistant.components.nest.climate_sdm: info
+    homeassistant.components.nest.camera_sdm: info
+    homeassistant.components.nest.sensor_sdm: info
+    homeassistant.helpers.config_entry_flow: info
+    homeassistant.helpers.config_entry_oauth2_flow: debug
+    google_nest_sdm: debug
+    google_nest_sdm.device: info
+    google_nest_sdm.device_manager: info
+    google_nest_sdm.google_nest_subscriber: info
+    google_nest_sdm.event: info
+    custom_components.mail_and_packages: info
+    custom_components.adaptive_lighting: info
+    homeassistant.components.zha: debug
+    zigpy: debug

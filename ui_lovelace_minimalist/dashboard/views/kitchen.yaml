@@ -1,0 +1,81 @@
+title: "Kitchen"
+path: "kitchen"
+cards:
+  - type: "custom:button-card"
+    template: chip_back
+    variables:
+      ulm_chip_back_path: home
+
+  - type: "custom:button-card"
+    template: card_title
+    name: Kitchen
+
+  - type: horizontal-stack
+    cards:
+      - type: "custom:button-card"
+        template: card_graph
+        entity: sensor.kitchen_temperature
+        variables:
+          ulm_card_graph_color: "var(--google-red)"
+          ulm_card_graph_name: Kitchen Temperature
+          ulm_card_graph_entity: sensor.kitchen_temperature
+          ulm_card_graph_type: fill
+          ulm_card_graph_hours: 24
+      - type: "custom:button-card"
+        template: card_graph
+        entity: sensor.kitchen_illuminance
+        variables:
+          ulm_card_graph_color: "var(--google-yellow)"
+          ulm_card_graph_name: Kitchen illumination
+          ulm_card_graph_entity: sensor.kitchen_illuminance
+          ulm_card_graph_type: fill
+          ulm_card_graph_hours: 24
+
+  - type: "custom:button-card"
+    template: card_title
+    label: "Devices"
+
+  - type: horizontal-stack
+    cards:
+      - type: "custom:button-card"
+        template: card_light
+        entity: light.kitchen_lights_group
+        variables:
+          ulm_card_light_name: Kitchen Lights
+          ulm_card_light_enable_popup: true
+          ulm_card_light_enable_slider: true
+          ulm_card_light_enable_color: true
+          ulm_card_light_force_background_color: true
+          ulm_card_light_enable_collapse: true
+  - type: "custom:button-card"
+    template: card_media_player
+    entity: media_player.kitchen
+    variables:
+      ulm_card_media_player_name: Dining Room Sonos
+      ulm_card_media_player_enable_art: true
+      ulm_card_media_player_enable_controls: true
+      ulm_card_media_player_collapsible: true
+      ulm_card_media_player_enable_volume_slider: true
+
+  - type: "custom:button-card"
+    template: card_title
+    label: "Sensors"
+
+  - type: horizontal-stack
+    cards:
+      - type: "custom:button-card"
+        template:
+          - card_binary_sensor_alert
+          - battery_info
+        entity: binary_sensor.kitchen_motion
+        variables:
+          ulm_card_binary_sensor_alert: true
+          ulm_show_last_changed: true
+          ulm_battery_entity: sensor.kitchen_motion_sensor
+      - type: "custom:button-card"
+        template: card_battery
+        entity: sensor.kitchen_motion_sensor
+        variables:
+          ulm_card_battery_battery_level_danger: 10
+          ulm_card_battery_battery_level_warning: 20
+          ulm_card_battery_name: Kitchen Sensor

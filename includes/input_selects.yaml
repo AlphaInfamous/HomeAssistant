@@ -1,0 +1,19 @@
+bathroom_color:
+  options:
+    - red
+    - blue
+    - purple
+    - pink
+    - white
+  icon: mdi:lightbulb-on
+
+theme:
+  options:
+    - blue-red
+    - dark-blue
+    - dark-green
+    - light-blue
+    - light-green
+    - orange
+    - red
+  icon: mdi:format-color-fill

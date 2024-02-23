@@ -1,0 +1,91 @@
+title: "Dining Room"
+path: "dining_room"
+cards:
+  - type: "custom:button-card"
+    template: chip_back
+    variables:
+      ulm_chip_back_path: home
+
+  - type: "custom:button-card"
+    template: card_title
+    name: Dining Room
+
+  - type: horizontal-stack
+    cards:
+      - type: "custom:button-card"
+        template: card_graph
+        entity: sensor.aeires_pm2_5
+        variables:
+          ulm_card_graph_color: "var(--google-red)"
+          ulm_card_graph_name: Air PM2.5
+          ulm_card_graph_entity: sensor.aeires_pm2_5
+          ulm_card_graph_type: fill
+          ulm_card_graph_hours: 24
+
+  - type: "custom:button-card"
+    template: card_title
+    label: "Devices"
+
+  - type: horizontal-stack
+    cards:
+      - type: "custom:button-card"
+        template: card_light
+        entity: light.diningroom
+        variables:
+          ulm_card_light_name: Dining Lights
+          ulm_card_light_enable_popup: true
+          ulm_card_light_enable_slider: true
+          ulm_card_light_enable_color: true
+          ulm_card_light_force_background_color: true
+          ulm_card_light_enable_collapse: true
+      - type: custom:button-card
+        template: custom_card_saxel_fan
+        entity: fan.aeires
+        name: Aeires
+        variables:
+          collapsible: true
+
+  - type: "custom:button-card"
+    template: card_media_player
+    entity: media_player.kitchen
+    variables:
+      ulm_card_media_player_name: Dining Room Sonos
+      ulm_card_media_player_enable_art: true
+      ulm_card_media_player_enable_controls: true
+      ulm_card_media_player_collapsible: true
+      ulm_card_media_player_enable_volume_slider: true
+      ulm_card_media_player_enable_popup: true
+
+  # - type: "custom:button-card"
+  #   template: "card_vacuum"
+  #   entity: "vacuum.roomba"
+  #   variables:
+  #     ulm_card_vacuum_room: "script.clean_kitchen"
+  #     ulm_card_vacuum_room_icon: "mdi:table-chair"
+  #     ulm_card_vacuum_camera: "camera.vacuum_map"
+  #     ulm_card_vacuum_camera_toggle: true
+
+  - type: "custom:button-card"
+    template: card_title
+    label: "Sensors"
+
+  - type: horizontal-stack
+    cards:
+      - type: "custom:button-card"
+        template:
+          - card_binary_sensor_alert
+          - battery_info
+        entity: sensor.aeires_filter_life
+        variables:
+          ulm_card_binary_sensor_alert: true
+          ulm_show_last_changed: true
+          ulm_battery_entity: sensor.aeires_filter_life
+      - type: "custom:button-card"
+        template:
+          - card_binary_sensor_alert
+          - battery_info
+        entity: sensor.roomba_battery_level
+        variables:
+          ulm_card_binary_sensor_alert: true
+          ulm_show_last_changed: true
+          ulm_battery_entity: sensor.roomba_battery_level

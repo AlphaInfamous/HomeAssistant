@@ -1,0 +1,12 @@
+- id: hass_github_push
+  alias: "[Hass] Github Push"
+  description: " Publish Configs every 6hrs to Github"
+  trigger:
+    - platform: time_pattern
+      hours: "23"
+      minutes: "*"
+  condition: []
+  action:
+    - service: shell_command.push_updates_to_github
+      data: {}
+  mode: single

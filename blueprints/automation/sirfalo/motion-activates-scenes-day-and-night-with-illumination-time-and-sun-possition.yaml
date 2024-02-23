@@ -1,0 +1,184 @@
+blueprint:
+  name: YAMA Falo Scenes v2
+  description: "# YAMA Falo Scenes\nTurn on scenes when motion is detected. \nSeparate
+    scene for day and night\nAssumptions: 1. Day scene is active from sun azimuth
+    (close to sunrise) till specific hour (when we go sleep). 2. Night scene is active
+    from specific hour to sun azimuth . 3. Ambient scene is active from sun azimuth
+    in evening till some hour. 4. Day/Night scene is active only when light sensor
+    have low LUX value (I'm checking outside light so when it's cloudy then it makes
+    sense to use scene).\n"
+  domain: automation
+  input:
+    motion_entity:
+      name: Motion Sensor
+      description: Motion Sensor or a group with Motion Sensors (But can be anything
+        switching between "on" and "off")
+      selector:
+        entity:
+          domain: binary_sensor
+          device_class: motion
+          multiple: false
+    illuminance_sensor:
+      name: (OPTIONAL) Illuminance sensor
+      description: This sensor will be used to determine the illumination.
+      default:
+      selector:
+        entity:
+          domain: sensor
+          device_class: illuminance
+          multiple: false
+    illuminance_cutoff:
+      name: (OPTIONAL) Illuminance cutoff value
+      description: This input_number will be used to compare to the current illumination
+        to determine if it is low.
+      default:
+      selector:
+        number:
+          min: 0.0
+          max: 3600.0
+          unit_of_measurement: lux
+          mode: slider
+          step: 1.0
+    no_motion_wait:
+      name: Wait time
+      description: Time to leave the light on after last motion is detected.
+      default: 120
+      selector:
+        number:
+          min: 0.0
+          max: 3600.0
+          unit_of_measurement: seconds
+          mode: slider
+          step: 1.0
+    scene_day:
+      name: DAY Scene (Optional)
+      default: scene.none
+      selector:
+        entity:
+          domain: scene
+          multiple: false
+    scene_night:
+      name: NIGHT Scene (Optional)
+      default: scene.none
+      selector:
+        entity:
+          domain: scene
+          multiple: false
+    time_scene_night_start:
+      name: NIGHT Scene start - time (Optional)
+      description: A time input which defines the time from which on the scene will
+        be activated if motion is detectedd.
+      default: '22:00:00'
+      selector:
+        time: {}
+    sun_scene_night_end:
+      name: NIGHT Scene end - sun possition (Optional)
+      description: Night scene will go off after sun is higher than
+      default: none
+      selector:
+        number:
+          min: -90.0
+          max: 90.0
+          unit_of_measurement: degrees
+          mode: slider
+          step: 1.0
+    scene_ambient:
+      name: AMBIENT Scene (Optional)
+      description: Scene for ambient state. Will be activated when no motion is detected.
+      default: scene.none
+      selector:
+        entity:
+          domain: scene
+          multiple: false
+    sun_scene_ambient_start:
+      name: AMBIENT scene start - sun (Optional)
+      description: Time from which on ambient scene will be activated
+      default: none
+      selector:
+        number:
+          min: -90.0
+          max: 90.0
+          unit_of_measurement: degrees
+          mode: slider
+          step: 1.0
+    time_scene_ambient_end:
+      name: AMBIENT scene end - sun (Optional)
+      description: Time from which on ambient scene will be not activated
+      default: '23:30:00'
+      selector:
+        time: {}
+    scene_dark:
+      name: DARK Scene (Optional)
+      description: Scene for DARK STATE state. Will be activated when no motion is
+        detected.
+      default: scene.none
+      selector:
+        entity:
+          domain: scene
+          multiple: false
+    time_day_change:
+      name: Time when "day" is over
+      description: This is only needed for conditions to work correctly
+      default: 03:00:00
+      selector:
+        time: {}
+  source_url: https://community.home-assistant.io/t/motion-activates-scenes-day-and-night-with-illumination-time-and-sun-possition/453328
+mode: restart
+max_exceeded: silent
+variables:
+  scene_ambient_start: !input sun_scene_ambient_start
+  scene_night_end: !input sun_scene_night_end
+trigger:
+- platform: state
+  entity_id: !input motion_entity
+  from: 'off'
+  to: 'on'
+- platform: state
+  entity_id: !input motion_entity
+  from: 'on'
+  to: 'off'
+  for: !input no_motion_wait
+action:
+- choose:
+  - conditions:
+    - condition: template
+      value_template: '{{ trigger.to_state.state == ''on'' }}'
+    - condition: numeric_state
+      entity_id: !input illuminance_sensor
+      below: !input illuminance_cutoff
+    sequence:
+    - choose:
+      - conditions:
+        - '{{ scene_day != ''scene.none''}}'
+        - condition: time
+          after: !input time_day_change
+          before: !input time_scene_night_start
+        sequence:
+        - scene: !input scene_day
+      - conditions:
+        - '{{ scene_night != ''scene.none''}}'
+        - condition: time
+          after: !input time_scene_night_start
+          before: !input time_day_change
+        - condition: template
+          value_template: '{{ (state_attr(''sun.sun'',''elevation'') < scene_night_end)
+            }}'
+        sequence:
+        - scene: !input scene_night
+  - conditions:
+    - condition: template
+      value_template: '{{ trigger.to_state.state == ''off'' }}'
+    sequence:
+    - choose:
+      - conditions:
+        - '{{ scene_ambient != ''scene.none'' }}'
+        - condition: time
+          after: !input time_day_change
+          before: !input time_scene_ambient_end
+        - condition: template
+          value_template: '{{ (sun_scene_ambient_start == none) or (state_attr(''sun.sun'',''elevation'')
+            <= scene_ambient_start) }}'
+        sequence:
+        - scene: !input scene_ambient
+      default:
+      - scene: !input scene_dark

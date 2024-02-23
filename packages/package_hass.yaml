@@ -1,0 +1,151 @@
+###############################################################################
+## Package - Hass
+###############################################################################
+homeassistant:
+  customize:
+    alert.update_available:
+      icon: mdi:cloud-upload
+      category: hass
+    alert.integration_offline:
+      icon: mdi:api-off
+      category: hass
+
+input_boolean:
+  hass_alerts:
+    name: "Hass Alerts"
+    icon: mdi:alert
+  startup_pending:
+    name: "Startup Pending"
+    icon: mdi:restart-alert
+    initial: true
+
+input_select:
+  log_level:
+    name: "Log Level"
+    icon: mdi:format-indent-decrease
+    options:
+      - info
+      - warn
+      - error
+      - critical
+      - fatal
+      - debug
+      - notset
+
+input_number:
+  battery_alert_threshold:
+    name: "Battery Alert Threshold"
+    icon: mdi:battery-alert
+    min: 0
+    max: 100
+    step: 1
+    unit_of_measurement: "%"
+
+# mqtt:
+#   binary_sensor:
+#     - name: "Kiosk Screen"
+#       state_topic: "fully/event/+/6c1f5c36-170d28b1"
+#       value_template: "{{ value_json.event }}"
+#       payload_on: "screenOn"
+#       payload_off: "screenOff"
+
+#     - name: "Kiosk Motion"
+#       device_class: motion
+#       state_topic: "fully/event/onMotion/6c1f5c36-170d28b1"
+#       value_template: "{{ value_json.type }}"
+#       payload_on: visual
+#       off_delay: 10
+
+sensor:
+  # https://www.home-assistant.io/integrations/websocket_api/#track-current-connections
+  - platform: websocket_api # https://www.home-assistant.io/integrations/sensor.websocket_api/
+
+  # - platform: feedparser
+  #   name: "Home Assistant Alerts"
+  #   feed_url: https://alerts.home-assistant.io/feed.xml
+  #   date_format: "%Y-%m-%d"
+  #   inclusions:
+  #     - title
+  #     - updated
+  #     - content
+  #     - link
+  #   exclusions:
+  #     - language
+
+  # https://developers.home-assistant.io/docs/api/supervisor/endpoints
+  - platform: command_line
+    name: "HASS Core Stats"
+    command: 'curl http://supervisor/core/stats -H "Authorization: Bearer $(printenv SUPERVISOR_TOKEN)" | jq ''{"cpu_percent":.data.cpu_percent,"memory_percent":.data.memory_percent,"memory_usage":.data.memory_usage}'''
+    value_template: "{{ value_json.memory_percent }}"
+    json_attributes:
+      - cpu_percent
+      - memory_percent
+      - memory_usage
+    scan_interval: 30
+    command_timeout: 10
+
+  - platform: command_line
+    name: "HASS Supervisor Stats"
+    command: 'curl http://supervisor/supervisor/stats -H "Authorization: Bearer $(printenv SUPERVISOR_TOKEN)" | jq ''{"cpu_percent":.data.cpu_percent,"memory_percent":.data.memory_percent,"memory_usage":.data.memory_usage}'''
+    value_template: "{{ value_json.memory_percent }}"
+    json_attributes:
+      - cpu_percent
+      - memory_percent
+      - memory_usage
+    scan_interval: 30
+    command_timeout: 10
+
+  - platform: command_line
+    name: "HASS Multicast Stats"
+    command: 'curl http://supervisor/multicast/stats -H "Authorization: Bearer $(printenv SUPERVISOR_TOKEN)" | jq ''{"cpu_percent":.data.cpu_percent,"memory_percent":.data.memory_percent,"memory_usage":.data.memory_usage}'''
+    value_template: "{{ value_json.memory_percent }}"
+    json_attributes:
+      - cpu_percent
+      - memory_percent
+      - memory_usage
+    scan_interval: 30
+    command_timeout: 10
+
+  - platform: command_line
+    name: "HASS Audio Stats"
+    command: 'curl http://supervisor/audio/stats -H "Authorization: Bearer $(printenv SUPERVISOR_TOKEN)" | jq ''{"cpu_percent":.data.cpu_percent,"memory_percent":.data.memory_percent,"memory_usage":.data.memory_usage}'''
+    value_template: "{{ value_json.memory_percent }}"
+    json_attributes:
+      - cpu_percent
+      - memory_percent
+      - memory_usage
+    scan_interval: 30
+    command_timeout: 10
+
+  - platform: command_line
+    name: "HASS Cli Stats"
+    command: 'curl http://supervisor/cli/stats -H "Authorization: Bearer $(printenv SUPERVISOR_TOKEN)" | jq ''{"cpu_percent":.data.cpu_percent,"memory_percent":.data.memory_percent,"memory_usage":.data.memory_usage}'''
+    value_template: "{{ value_json.memory_percent }}"
+    json_attributes:
+      - cpu_percent
+      - memory_percent
+      - memory_usage
+    scan_interval: 30
+    command_timeout: 10
+
+  - platform: command_line
+    name: "HASS DNS Stats"
+    command: 'curl http://supervisor/dns/stats -H "Authorization: Bearer $(printenv SUPERVISOR_TOKEN)" | jq ''{"cpu_percent":.data.cpu_percent,"memory_percent":.data.memory_percent,"memory_usage":.data.memory_usage}'''
+    value_template: "{{ value_json.memory_percent }}"
+    json_attributes:
+      - cpu_percent
+      - memory_percent
+      - memory_usage
+    scan_interval: 30
+    command_timeout: 10
+
+  - platform: command_line
+    name: "HASS Observer Stats"
+    command: 'curl http://supervisor/observer/stats -H "Authorization: Bearer $(printenv SUPERVISOR_TOKEN)" | jq ''{"cpu_percent":.data.cpu_percent,"memory_percent":.data.memory_percent,"memory_usage":.data.memory_usage}'''
+    value_template: "{{ value_json.memory_percent }}"
+    json_attributes:
+      - cpu_percent
+      - memory_percent
+      - memory_usage
+    scan_interval: 30
+    command_timeout: 10

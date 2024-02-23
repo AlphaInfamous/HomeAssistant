@@ -1,0 +1,592 @@
+- id: '1662320914827'
+  alias: Low battery level notification
+  description: Detects and Notifies Low battery levels on Sensors
+  use_blueprint:
+    path: sbyx/low-battery-level-detection-notification-for-all-battery-sensors.yaml
+    input:
+      threshold: 10
+      actions:
+      - service: notify.persistent_notification
+        data:
+          title: Low Battery Warning!
+          message: 'Low Battery Detected on: {{sensors|replace(", ", "\n")}}'
+      - service: notify.all_personal_devices
+        data:
+          title: Low Battery Warning!
+          message: 'Low Battery Detected on: {{sensors|replace(", ", "\n")}}'
+      exclude:
+        entity_id:
+        - sensor.alpha_iphone_battery_level
+        - sensor.ipad_battery_level
+- id: '1662613348826'
+  alias: Kitchen Automation
+  description: Turns Kitchen Lights On & Off based on motion in Kitchen
+  trigger:
+  - type: motion
+    platform: device
+    device_id: 075f034bd1015ab0c9ab151bc8087203
+    entity_id: binary_sensor.kitchen_motion
+    domain: binary_sensor
+    id: kitchen_motion_on
+  - type: no_motion
+    platform: device
+    device_id: 075f034bd1015ab0c9ab151bc8087203
+    entity_id: binary_sensor.kitchen_motion
+    domain: binary_sensor
+    id: kitchen_motion_off
+    for:
+      hours: 0
+      minutes: 3
+      seconds: 0
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: kitchen_motion_on
+      sequence:
+      - service: light.turn_on
+        data:
+          brightness_step_pct: 40
+        target:
+          entity_id: light.kitchen_lights_group
+    - conditions:
+      - condition: trigger
+        id: kitchen_motion_off
+      sequence:
+      - service: light.turn_off
+        data:
+          transition: 13
+        target:
+          entity_id: light.kitchen_lights_group
+  mode: single
+- id: '1662617927962'
+  alias: automation_master_bath
+  description: Master bath lights and Vent fan
+  trigger:
+  - type: opened
+    platform: device
+    device_id: 68b24ecf14ab68e989205325f3937cd5
+    entity_id: b48f8e590d7a9ee967fcb0ccfff8686a
+    domain: binary_sensor
+    id: master_bath_door_open
+  - type: not_opened
+    platform: device
+    device_id: 68b24ecf14ab68e989205325f3937cd5
+    entity_id: b48f8e590d7a9ee967fcb0ccfff8686a
+    domain: binary_sensor
+    id: master_bath_door_closed
+  - platform: state
+    entity_id:
+    - light.master_bath_dome
+    - light.master_bath_vanity
+    to: 'on'
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 5
+    id: Lights on 5S
+  - platform: state
+    entity_id:
+    - light.master_bath_vanity
+    - light.master_bath_dome
+    to: 'off'
+    for:
+      hours: 0
+      minutes: 5
+      seconds: 0
+    id: 5 mins after lights off
+  - platform: device
+    type: turned_on
+    device_id: 12c453b8fa5f7aa805fa636ca446605d
+    entity_id: 1d65c04014f9925f53f2e41998a2048e
+    domain: fan
+    id: Vent is on for 1H
+    for:
+      hours: 1
+      minutes: 0
+      seconds: 0
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - master_bath_door_open
+      sequence:
+      - if:
+        - condition: state
+          entity_id: light.master_bath_lights
+          state: 'off'
+        then:
+        - service: light.turn_on
+          data:
+            transition: 1
+          target:
+            entity_id:
+            - light.master_bath_vanity
+            - light.master_bath_dome
+        else:
+        - service: light.turn_off
+          data:
+            transition: 2
+          target:
+            entity_id:
+            - light.master_bath_dome
+            - light.master_bath_vanity
+    - conditions:
+      - condition: and
+        conditions:
+        - condition: trigger
+          id: 5 mins after lights off
+        - condition: numeric_state
+          entity_id: sensor.master_bath_humidity
+          below: 75
+      sequence:
+      - service: fan.turn_off
+        data: {}
+        target:
+          entity_id: fan.master_bath_vent
+    - conditions:
+      - condition: trigger
+        id:
+        - Lights on 5S
+      sequence:
+      - service: fan.turn_on
+        data: {}
+        target:
+          entity_id: fan.master_bath_vent
+    - conditions:
+      - condition: trigger
+        id:
+        - Vent is on for 1H
+      sequence:
+      - service: fan.turn_off
+        data: {}
+        target:
+          entity_id: fan.master_bath_vent
+  mode: single
+- id: '1662996401745'
+  alias: Half Bath Automation
+  description: Half bath lights and Vent fan
+  trigger:
+  - type: opened
+    platform: device
+    device_id: 2f57b476393d25046b9cd382a07f2445
+    entity_id: 0a31b1c4aad627d0158501b78767aac4
+    domain: binary_sensor
+    id: half_bath_door_open
+  - type: not_opened
+    platform: device
+    device_id: 2f57b476393d25046b9cd382a07f2445
+    entity_id: 0a31b1c4aad627d0158501b78767aac4
+    domain: binary_sensor
+    id: half_bath_door_closed
+  - platform: state
+    entity_id:
+    - light.half_bath_vanity
+    to: 'on'
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 2
+    id: ' lights ON 2S'
+  - platform: state
+    entity_id:
+    - light.half_bath_vanity
+    to: 'off'
+    for:
+      hours: 0
+      minutes: 5
+      seconds: 0
+    id: 5 mins after lights off
+  - platform: device
+    type: turned_on
+    device_id: 3752c332843c70f7e78d3ba37eabae24
+    entity_id: 12fe6ccde8474b61174e827c90f3cd2c
+    domain: fan
+    id: Half Bath Vent On
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: half_bath_door_open
+      sequence:
+      - if:
+        - condition: state
+          entity_id: light.half_bath_vanity
+          state: 'off'
+        then:
+        - service: light.turn_on
+          data:
+            transition: 2
+          target:
+            entity_id: light.half_bath_vanity
+        else:
+        - service: light.turn_off
+          data:
+            transition: 2
+          target:
+            entity_id: light.half_bath_vanity
+    - conditions:
+      - condition: trigger
+        id: 5 mins after lights off
+      sequence:
+      - service: fan.turn_off
+        data: {}
+        target:
+          entity_id: fan.half_bath_vent
+    - conditions:
+      - condition: trigger
+        id:
+        - ' lights ON 2S'
+      sequence:
+      - service: fan.turn_on
+        data: {}
+        target:
+          entity_id: fan.half_bath_vent
+  mode: single
+- id: '1663025967492'
+  alias: Guest Bath Automation
+  description: Guest bath lights and Vent fan
+  trigger:
+  - type: opened
+    platform: device
+    device_id: fa3ff91151336895411ca73129ed051e
+    entity_id: 6614908c6ba36db57331b46e4759cddc
+    domain: binary_sensor
+    id: guest_bath_door_open
+  - type: not_opened
+    platform: device
+    device_id: fa3ff91151336895411ca73129ed051e
+    entity_id: 6614908c6ba36db57331b46e4759cddc
+    domain: binary_sensor
+    id: guest_bath_door_closed
+  - platform: state
+    entity_id:
+    - light.guest_bath_vanity
+    to: 'on'
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 5
+    id: guest bath lights are on for 5 s
+  - platform: state
+    entity_id:
+    - light.guest_bath_vanity
+    to: 'off'
+    for:
+      hours: 0
+      minutes: 5
+      seconds: 0
+    id: 5 mins after lights off
+  - platform: device
+    type: turned_on
+    device_id: bf4f7f5183a5399b26c15cec4345893e
+    entity_id: 08697c5de7238b13d5247aa8d2c3e539
+    domain: fan
+    id: Vent on for 1H:00M
+    for:
+      hours: 1
+      minutes: 0
+      seconds: 0
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: guest_bath_door_open
+      sequence:
+      - if:
+        - condition: state
+          entity_id: light.guest_bath_vanity
+          state: 'off'
+        then:
+        - service: light.turn_on
+          data:
+            transition: 1
+          target:
+            entity_id: light.guest_bath_vanity
+        else:
+        - service: light.turn_off
+          data:
+            transition: 2
+          target:
+            entity_id: light.guest_bath_vanity
+    - conditions:
+      - condition: and
+        conditions:
+        - condition: trigger
+          id: 5 mins after lights off
+        - condition: numeric_state
+          entity_id: sensor.guest_bath_humidity
+          below: 75
+      sequence:
+      - service: fan.turn_off
+        data: {}
+        target:
+          entity_id: fan.guest_bath_vent
+    - conditions:
+      - condition: trigger
+        id:
+        - guest bath lights are on for 5 s
+      sequence:
+      - service: fan.turn_on
+        data: {}
+        target:
+          entity_id: fan.guest_bath_vent
+    - conditions:
+      - condition: trigger
+        id:
+        - Vent on for 1H:00M
+      sequence:
+      - service: fan.turn_off
+        data: {}
+        target:
+          entity_id: fan.guest_bath_vent
+  mode: single
+- id: '1663719979876'
+  alias: Cinema Automation
+  description: Sets up Cinema mode
+  trigger:
+  - device_id: 133615fd925660b6f6b181ee478b6118
+    domain: zha
+    platform: device
+    type: remote_button_short_press
+    subtype: turn_on
+    id: Single Press
+  - device_id: 133615fd925660b6f6b181ee478b6118
+    domain: zha
+    platform: device
+    type: remote_button_double_press
+    subtype: turn_on
+    id: long press
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id:
+        - long press
+      sequence:
+      - service: scene.turn_on
+        data:
+          transition: 5
+        target:
+          entity_id: scene.cinema_scene
+    - conditions:
+      - condition: trigger
+        id: Single Press
+      sequence:
+      - service: light.turn_on
+        data: {}
+        target:
+          entity_id: light.living_room_light
+          device_id: ca1f96c9af117d253fc0cdf1a78769da
+  mode: single
+- id: '1667172902848'
+  alias: Guest Bedroom
+  description: ''
+  trigger:
+  - device_id: 5a1343258f4b36b3d442b1a18d3fabf9
+    domain: zha
+    platform: device
+    type: remote_button_short_press
+    subtype: turn_on
+    id: Turn On
+  - device_id: 5a1343258f4b36b3d442b1a18d3fabf9
+    domain: zha
+    platform: device
+    type: remote_button_short_press
+    subtype: turn_off
+    id: Turn Off
+  - device_id: 5a1343258f4b36b3d442b1a18d3fabf9
+    domain: zha
+    platform: device
+    type: remote_button_long_press
+    subtype: dim_down
+    id: Turn Off All
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: Turn On
+      sequence:
+      - service: light.turn_on
+        data: {}
+        target:
+          entity_id: light.guest_bedroom_light
+    - conditions:
+      - condition: trigger
+        id: Turn Off
+      sequence:
+      - service: light.turn_off
+        data: {}
+        target:
+          entity_id: light.guest_bedroom_light
+    - conditions:
+      - condition: trigger
+        id: Turn Off All
+      sequence:
+      - if:
+        - condition: state
+          entity_id: light.guest_bath_vanity
+          state: 'on'
+        then:
+        - service: light.turn_off
+          data:
+            transition: 2
+          target:
+            entity_id: light.guest_bath_vanity
+      - service: light.turn_off
+        data: {}
+        target:
+          entity_id: light.guest_bedroom_light
+      - service: fan.turn_off
+        data: {}
+        target:
+          entity_id: fan.guest_bath_vent
+  mode: single
+- id: '1667174593956'
+  alias: Master Bedroom
+  description: ''
+  trigger:
+  - device_id: e9f9a8cc640a87ba5da60445cbe53ea4
+    domain: zha
+    platform: device
+    type: remote_button_short_press
+    subtype: turn_on
+    id: Turn On
+  - device_id: e9f9a8cc640a87ba5da60445cbe53ea4
+    domain: zha
+    platform: device
+    type: remote_button_short_press
+    subtype: turn_off
+    id: Turn Off
+  - device_id: e9f9a8cc640a87ba5da60445cbe53ea4
+    domain: zha
+    platform: device
+    type: remote_button_long_press
+    subtype: dim_down
+    id: turn off all
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: Turn On
+      sequence:
+      - service: light.turn_on
+        data:
+          transition: 14
+        target:
+          entity_id: light.master_bedroom_lights
+    - conditions:
+      - condition: trigger
+        id: Turn Off
+      sequence:
+      - service: light.turn_off
+        data:
+          transition: 2
+        target:
+          entity_id: light.master_bedroom_lights
+    - conditions:
+      - condition: trigger
+        id: turn off all
+      sequence:
+      - service: light.turn_off
+        data:
+          transition: 2
+        target:
+          entity_id:
+          - light.master_bedroom_lights
+          - light.master_bath_dome
+          - light.master_bath_vanity
+      - service: fan.turn_off
+        data: {}
+        target:
+          entity_id: fan.master_bath_vent
+  mode: single
+- id: '1686865206936'
+  alias: GithubPush
+  description: ' Publish Configs every 6hrs to Github'
+  trigger:
+  - platform: time_pattern
+    hours: '23'
+  condition: []
+  action:
+  - service: shell_command.push_updates_to_github
+    data: {}
+  mode: single
+- id: '1688706576122'
+  alias: Lock
+  description: Locks door if it’s unlocked
+  trigger:
+  - platform: time
+    at: 00:00:00
+    id: Time 12AM
+  - platform: device
+    device_id: 237f2396e815d242d40de35e14b9221c
+    domain: alarm_control_panel
+    entity_id: alarm_control_panel.wyze_home_monitoring_system
+    type: armed_home
+    id: Armed Home
+  - platform: device
+    device_id: 237f2396e815d242d40de35e14b9221c
+    domain: alarm_control_panel
+    entity_id: alarm_control_panel.wyze_home_monitoring_system
+    type: armed_away
+    id: Armed Away
+  condition: []
+  action:
+  - choose:
+    - conditions:
+      - condition: trigger
+        id: Time 12AM
+      sequence:
+      - if:
+        - condition: state
+          entity_id: lock.front_door
+          state: unlocked
+        then:
+        - service: lock.lock
+          data: {}
+          target:
+            entity_id: lock.front_door
+      - service: notify.all_personal_devices
+        data: {}
+    - conditions:
+      - condition: or
+        conditions:
+        - condition: trigger
+          id: Armed Home
+        - condition: trigger
+          id: Armed Away
+      sequence:
+      - if:
+        - condition: state
+          entity_id: lock.front_door
+          state: unlocked
+        then:
+        - service: lock.lock
+          data: {}
+          target:
+            entity_id: lock.front_door
+        - service: notify.all_personal_devices
+          data:
+            title: Door was Locked
+  mode: single
+- id: '1708730597299'
+  alias: '[Hass] Github Push'
+  description: ' Publish Configs every 6hrs to Github'
+  trigger:
+  - platform: time_pattern
+    hours: '23'
+    minutes: '*'
+  condition: []
+  action:
+  - service: shell_command.push_updates_to_github
+    data: {}
+  mode: single

@@ -1,0 +1,196 @@
+title: "Home"
+path: "home"
+cards:
+  - type: horizontal-stack
+    cards:
+      - type: custom:state-switch
+        entity: group
+        states:
+          admin:
+            type: custom:mushroom-chips-card
+            chips:
+              - type: menu
+              - type: action
+                icon_color: green
+                icon: mdi:arrow-all
+                tap_action:
+                  action: call-service
+                  service: input_boolean.toggle
+                  data: {}
+                  target:
+                    entity_id: input_boolean.kiosk_mode
+      - type: "custom:button-card"
+        template: chip_alarm
+        entity: alarm_control_panel.wyze_home_monitoring_system
+      - type: "custom:button-card"
+        template: chip_mdi_icon_state
+        variables:
+          ulm_chip_mdi_icon_state_entity: lock.front_door
+          ulm_chip_mdi_icon_state_icon: mdi:door
+          ulm_chip_mdi_icon_state_icon_color: red
+          ulm_chip_mdi_icon_state_label_color: blue
+
+  - type: "custom:button-card"
+    template: "card_esh_welcome"
+    triggers_update: "input_boolean.minimalist_dropdown"
+    variables:
+      ulm_card_esh_welcome_collapse: input_boolean.minimalist_dropdown
+      ulm_weather: "weather.kcmh_daynight"
+      entity_1:
+        nav: "house"
+        icon: "mdi:home"
+        name: "House"
+        color: "blue"
+      entity_2:
+        nav: "lights"
+        icon: "mdi:lightbulb"
+        name: "Lights"
+        color: "yellow"
+      entity_3:
+        nav: "security"
+        icon: "mdi:shield"
+        name: Secure
+        color: "green"
+        template: chip_alarm
+        entity: alarm_control_panel.wyze_home_monitoring_system
+      entity_4:
+        nav: "network"
+        icon: "mdi:nas"
+        name: Lab
+        color: "purple"
+      entity_5:
+        nav: "network"
+        icon: "mdi:flask"
+        name: Lab
+        color: "red"
+
+  - type: horizontal-stack
+    cards:
+      - type: "custom:button-card"
+        template: card_person
+        entity: person.maneesh_vadlapalta
+        variables:
+          ulm_card_person_entity: person.maneesh_vadlapalta
+          ulm_card_person_use_entity_picture: true
+          ulm_card_person_icon: mdi:face-man
+          ulm_card_person_zone1: zone.Polaris Mall
+          ulm_card_person_zone2: zone.Work - HNB
+          # ulm_address: sensor.alpha_iphone_gegeocodeerde_locatie
+      - type: "custom:button-card"
+        template: card_person
+        entity: person.anu
+        variables:
+          ulm_card_person_entity: person.anu
+          ulm_card_person_use_entity_picture: true
+          ulm_card_person_icon: mdi:face-woman
+          ulm_card_person_zone1: zone.Polaris Mall
+          ulm_card_person_zone2: zone.Work - HNB
+
+  - type: "custom:button-card"
+    template: card_title
+    name: Rooms
+
+  - type: horizontal-stack
+    cards:
+      - type: "custom:button-card"
+        template:
+          - card_esh_room
+          - yellow_on
+        name: Kitchen
+        entity: light.kitchen_lights_group
+        icon: mdi:fridge
+        tap_action:
+          action: navigate
+          navigation_path: "kitchen"
+        variables:
+          ulm_custom_card_esh_room_light_entity: light.kitchen_lights_group
+          # ulm_custom_card_esh_room_climate_entity: sensor.kitchen_temperature
+        label: >
+          [[[
+              return "🌡️ " + states['sensor.kitchen_temperature'].state + " °C" + " 🔆 " + states['sensor.kitchen_illuminance'].state + " %"
+            ]]]
+
+      - type: "custom:button-card"
+        template:
+          - card_esh_room
+          - yellow_on
+        name: Half Bath
+        entity: light.half_bath_vanity
+        icon: mdi:toilet
+        tap_action:
+          action: navigate
+          navigation_path: "half_bath"
+        variables:
+          ulm_custom_card_esh_room_light_entity: light.half_bath_vanity
+
+  - type: horizontal-stack
+    cards:
+      - type: "custom:button-card"
+        template:
+          - card_esh_room
+          - yellow_on
+        name: Dining Room
+        entity: light.diningroom
+        icon: mdi:table-chair
+        tap_action:
+          action: navigate
+          navigation_path: "dining_room"
+        variables:
+          ulm_custom_card_esh_room_light_entity: light.diningroom
+          # ulm_custom_card_esh_room_climate_entity: sensor.kitchen_temperature
+        label: >
+          [[[
+              return "🌡️ " + states['sensor.kitchen_temperature'].state + " °C" + " 🔆 " + states['sensor.kitchen_illuminance'].state + " %"
+            ]]]
+
+  #     - type: "custom:button-card"
+  #       template:
+  #         - card_esh_room
+  #         - yellow_on
+  #       name: Living Room
+  #       entity: light.half_bath_vanity
+  #       icon: mdi:toilet
+  #       tap_action:
+  #         action: navigate
+  #         navigation_path: "half_bath"
+  #       variables:
+  #         ulm_custom_card_esh_room_light_entity: light.half_bath_vanity
+
+  - type: horizontal-stack
+    cards:
+      - type: "custom:button-card"
+        template:
+          - card_esh_room
+          - yellow_on
+        name: Master Bath
+        entity: light.master_bath_lights
+        icon: mdi:shower
+        tap_action:
+          action: navigate
+          navigation_path: "master_bath"
+        variables:
+          ulm_custom_card_esh_room_light_entity: light.master_bath_lights
+          # ulm_custom_card_esh_room_climate_entity: fan.master_bath_vent
+        label: >
+          [[[
+              return "🌡️ " + states['sensor.master_bath_temperature'].state + " °C" + " 💧 " + states['sensor.master_bath_humidity'].state + " %"
+              ]]]
+
+      - type: "custom:button-card"
+        template:
+          - card_esh_room
+          
+          - yellow_on
+        name: Guest Bath
+        entity: light.guest_bath_vanity
+        icon: mdi:shower
+        tap_action:
+          action: navigate
+          navigation_path: "guest_bath"
+        variables:
+          ulm_custom_card_esh_room_light_entity: light.guest_bath_vanity
+          # ulm_custom_card_esh_room_climate_entity: fan.guest_bath_vent
+        label: >
+          [[[
+              return "🌡️ " + states['sensor.guest_bath_temperature'].state + " °C" + " 💧 " + states['sensor.guest_bath_humidity'].state + " %"
+              ]]]

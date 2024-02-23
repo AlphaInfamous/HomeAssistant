@@ -1,0 +1,55 @@
+- id: '1663720633953'
+  name: Cinema Scene
+  entities:
+    light.kitchen_lights_group:
+      min_color_temp_kelvin: 2202
+      max_color_temp_kelvin: 6535
+      min_mireds: 153
+      max_mireds: 454
+      supported_color_modes:
+      - color_temp
+      entity_id:
+      - light.kitchen_1
+      - light.kitchen_2
+      - light.kitchen_3
+      icon: mdi:light-recessed
+      friendly_name: Kitchen Lights Group
+      supported_features: 40
+      state: 'off'
+    light.living_room_light:
+      supported_color_modes:
+      - onoff
+      icon: mdi:lightbulb-fluorescent-tube
+      friendly_name: living_room-light
+      supported_features: 0
+      state: 'off'
+    light.diningroom:
+      min_color_temp_kelvin: 2000
+      max_color_temp_kelvin: 6535
+      min_mireds: 153
+      max_mireds: 500
+      supported_color_modes:
+      - color_temp
+      - xy
+      is_hue_group: true
+      hue_scenes:
+      - Warm embrace
+      - Winter mountain
+      - Cool bright
+      hue_type: room
+      lights:
+      - Dining1
+      - Dining2
+      dynamics: false
+      icon: mdi:lightbulb-group
+      friendly_name: DiningRoom
+      supported_features: 40
+      state: 'off'
+  icon: mdi:theater
+  metadata:
+    light.kitchen_lights_group:
+      entity_only: true
+    light.living_room_light:
+      entity_only: true
+    light.diningroom:
+      entity_only: true
