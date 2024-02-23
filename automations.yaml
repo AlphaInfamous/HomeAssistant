@@ -514,7 +514,7 @@
   description: ' Publish Configs every 6hrs to Github'
   trigger:
   - platform: time_pattern
-    hours: '23'
+    hours: '01'
   condition: []
   action:
   - service: shell_command.push_updates_to_github
