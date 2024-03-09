@@ -1,16 +1,13 @@
 from collections import OrderedDict
 import logging
 import voluptuous as vol
-from datetime import timedelta
 
 from homeassistant import config_entries
 from homeassistant.const import (
     CONF_PASSWORD,
     CONF_USERNAME,
     CONF_REGION,
-    CONF_PORT,
     CONF_SCAN_INTERVAL,
-    CONF_NAME,
 )
 from homeassistant.helpers.aiohttp_client import async_get_clientsession
 from homeassistant.core import callback
@@ -62,7 +59,7 @@ class AudiConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                     spin=self._spin,
                 )
 
-                if await connection.try_login(False) == False:
+                if await connection.try_login(False) is False:
                     raise Exception(
                         "Unexpected error communicating with the Audi server"
                     )
@@ -132,7 +129,7 @@ class AudiConfigFlow(config_entries.ConfigFlow, domain=DOMAIN):
                 spin=spin,
             )
 
-            if await connection.try_login(False) == False:
+            if await connection.try_login(False) is False:
                 raise Exception("Unexpected error communicating with the Audi server")
 
         except Exception:
