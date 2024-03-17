@@ -8,16 +8,18 @@
       actions:
       - service: notify.persistent_notification
         data:
-          title: Low Battery Warning!
+          title: "\U0001FAAB Low Battery Warning!"
           message: 'Low Battery Detected on: {{sensors|replace(", ", "\n")}}'
       - service: notify.all_personal_devices
         data:
-          title: Low Battery Warning!
+          title: "\U0001FAAB Low Battery Warning!"
           message: 'Low Battery Detected on: {{sensors|replace(", ", "\n")}}'
       exclude:
         entity_id:
-        - sensor.alpha_iphone_battery_level
-        - sensor.ipad_battery_level
+        - sensor.alpha_14pro_battery_level
+        - sensor.alphas_ipad_battery_level
+        - sensor.rakeshs_iphone_battery_level
+        - sensor.s22_ultra_battery_level
 - id: '1662613348826'
   alias: Kitchen Automation
   description: Turns Kitchen Lights On & Off based on motion in Kitchen
@@ -576,5 +578,6 @@
             entity_id: lock.front_door
         - service: notify.all_personal_devices
           data:
-            title: Door was Locked
+            title: Lock Automation
+            message: Attempting to Lock door!
   mode: single
